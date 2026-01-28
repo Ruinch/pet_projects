@@ -4,9 +4,12 @@ import (
 	"context"
 	"log"
 
+	"forgedeploy/internal/docker"
 	"forgedeploy/internal/domain"
 )
 
 func Rollback(ctx context.Context, p *domain.Pipeline) {
-	log.Println("[ROLLBACK] pipeline:", p.ID)
+	container := "forgedeploy-app"
+	log.Println("[ROLLBACK] stopping container")
+	docker.StopAndRemove(ctx, container)
 }
