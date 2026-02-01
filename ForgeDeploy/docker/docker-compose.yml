@@ -1,6 +1,17 @@
+version: "3.9"
+
 services:
-  registry:
-    image: registry:2
-    container_name: forgedeploy-registry
+  postgres:
+    image: postgres:16
+    container_name: forgedeploy-postgres
+    environment:
+      POSTGRES_USER: forgedeploy
+      POSTGRES_PASSWORD: forgedeploy
+      POSTGRES_DB: forgedeploy
     ports:
-      - "5000:5000"
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

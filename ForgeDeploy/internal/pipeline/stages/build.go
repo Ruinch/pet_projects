@@ -34,7 +34,7 @@ func Build(ctx context.Context, p *domain.Pipeline) error {
 	)
 
 	if err != nil {
-		log.Println("[BUILD] docker build failed")
+		log.Println("[BUILD] docker build failed", err)
 		log.Println(res.Logs)
 		return err
 	}

@@ -21,7 +21,7 @@ func NewEngine(repo store.PipelineRepository) *Engine {
 func (e *Engine) Run(ctx context.Context, p *domain.Pipeline) {
 	log.Println("pipeline started:", p.Name)
 
-	// create pipeline in DB
+	// 1. Create pipeline
 	if err := e.repo.CreatePipeline(p); err != nil {
 		log.Println("failed to create pipeline:", err)
 		return
@@ -29,7 +29,7 @@ func (e *Engine) Run(ctx context.Context, p *domain.Pipeline) {
 
 	_ = e.repo.UpdatePipelineStatus(p.ID, domain.PipelineRunning)
 
-	stages := []struct {
+	stageDefs := []struct {
 		name string
 		fn   func(context.Context, *domain.Pipeline) error
 	}{
@@ -39,7 +39,7 @@ func (e *Engine) Run(ctx context.Context, p *domain.Pipeline) {
 		{"deploy", stages.Deploy},
 	}
 
-	for _, s := range stages {
+	for _, s := range stageDefs {
 		stage := &domain.Stage{
 			PipelineID: p.ID,
 			Name:       s.name,
@@ -60,11 +60,13 @@ func (e *Engine) Run(ctx context.Context, p *domain.Pipeline) {
 
 		if err != nil {
 			stage.Status = domain.StageFailed
-			stage.Logs = err.Error()
-			_ = e.repo.UpdateStage(stage)
+			msg := err.Error()
+			stage.Logs = &msg
 
+			_ = e.repo.UpdateStage(stage)
 			_ = e.repo.UpdatePipelineStatus(p.ID, domain.PipelineFailed)
-			log.Println("pipeline failed on stage:", s.name)
+
+			log.Println("pipeline failed on stage:", s.name, "error:", err)
 			return
 		}
 

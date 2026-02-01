@@ -3,20 +3,12 @@ package domain
 import "time"
 
 type PipelineStatus string
-type StageStatus string
 
 const (
 	PipelinePending PipelineStatus = "pending"
 	PipelineRunning PipelineStatus = "running"
 	PipelineSuccess PipelineStatus = "success"
 	PipelineFailed  PipelineStatus = "failed"
-)
-
-const (
-	StagePending StageStatus = "pending"
-	StageRunning StageStatus = "running"
-	StageSuccess StageStatus = "success"
-	StageFailed  StageStatus = "failed"
 )
 
 type Pipeline struct {
