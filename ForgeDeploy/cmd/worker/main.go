@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"forgedeploy/internal/domain"
@@ -10,18 +11,22 @@ import (
 )
 
 func main() {
-	dsn := os.Getenv("POSTGRES_DSN")
-	db := store.NewPostgres(dsn)
-	repo := store.NewPipelineRepo(db)
+	ctx := context.Background()
+
+	db := store.NewPostgres(os.Getenv("POSTGRES_DSN"))
+	repo := store.NewPipelineRepoPostgres(db)
 
 	engine := pipeline.NewEngine(repo)
 
-	p := &domain.Pipeline{
-		ID:        "pipeline-1",
-		Repo:      "example/repo",
-		CommitSHA: "abc123",
-		Status:    "PENDING",
+	if err := store.ApplyMigrations(db); err != nil {
+		log.Fatal("failed to apply migrations:", err)
 	}
 
-	engine.Run(context.Background(), p)
+	p := &domain.Pipeline{
+		Name:      "pipeline-1",
+		CommitSHA: "abc123",
+		Status:    domain.PipelinePending,
+	}
+
+	engine.Run(ctx, p)
 }

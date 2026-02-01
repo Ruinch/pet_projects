@@ -10,13 +10,12 @@ import (
 )
 
 func Scan(ctx context.Context, p *domain.Pipeline) error {
-	image := fmt.Sprintf("forgedeploy/app:%s", p.CommitSHA)
+	image := fmt.Sprintf("localhost:5000/forgedeploy/app:%s", p.CommitSHA)
 
 	log.Println("[SCAN] trivy image:", image)
 
-	logs, err := security.ScanImage(ctx, image)
-	if err != nil {
-		log.Println(logs)
+	if err := security.ScanImage(ctx, image); err != nil {
+		log.Println("[SCAN] error:", err) // 🔥 ВАЖНО
 		return err
 	}
 

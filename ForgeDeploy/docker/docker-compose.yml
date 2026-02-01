@@ -1,5 +1,6 @@
 services:
   registry:
     image: registry:2
+    container_name: forgedeploy-registry
     ports:
       - "5000:5000"

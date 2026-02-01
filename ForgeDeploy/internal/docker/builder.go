@@ -3,7 +3,6 @@ package docker
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"os/exec"
 )
 
@@ -26,12 +25,9 @@ func BuildImage(ctx context.Context, image, dockerfile, contextDir string) (*Bui
 	cmd.Stderr = &out
 
 	err := cmd.Run()
-	if err != nil {
-		return nil, fmt.Errorf("docker build failed: %w\n%s", err, out.String())
-	}
 
 	return &BuildResult{
 		Image: image,
 		Logs:  out.String(),
-	}, nil
+	}, err
 }

@@ -1,19 +1,13 @@
 package store
 
-import (
-	"context"
-
-	"forgedeploy/internal/domain"
-)
+import "forgedeploy/internal/domain"
 
 type PipelineRepository interface {
-	Create(ctx context.Context, p *domain.Pipeline) error
-	UpdateStatus(ctx context.Context, id string, status string) error
-	SaveStage(
-		ctx context.Context,
-		pipelineID string,
-		stage string,
-		status string,
-		logs string,
-	) error
+	Create(p *domain.Pipeline) error
+	UpdateStatus(id int64, status string) error
+
+	CreateStage(s *domain.Stage) error
+	UpdateStage(s *domain.Stage) error
+
+	GetAll() ([]domain.Pipeline, error)
 }

@@ -3,19 +3,27 @@ package domain
 import "time"
 
 type PipelineStatus string
+type StageStatus string
 
 const (
-	StatusPending PipelineStatus = "PENDING"
-	StatusRunning PipelineStatus = "RUNNING"
-	StatusFailed  PipelineStatus = "FAILED"
-	StatusSuccess PipelineStatus = "SUCCESS"
+	PipelinePending PipelineStatus = "pending"
+	PipelineRunning PipelineStatus = "running"
+	PipelineSuccess PipelineStatus = "success"
+	PipelineFailed  PipelineStatus = "failed"
+)
+
+const (
+	StagePending StageStatus = "pending"
+	StageRunning StageStatus = "running"
+	StageSuccess StageStatus = "success"
+	StageFailed  StageStatus = "failed"
 )
 
 type Pipeline struct {
-	ID        string
-	Repo      string
-	CommitSHA string
-	Status    PipelineStatus
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int64          `json:"id"`
+	Name      string         `json:"name"`
+	CommitSHA string         `json:"commit_sha"`
+	Status    PipelineStatus `json:"status"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 }
