@@ -52,33 +52,31 @@ func (r *PipelineRepoPostgres) UpdateStage(s *domain.Stage) error {
 	return err
 }
 
-func (r *PipelineRepoPostgres) GetAll() ([]domain.Pipeline, error) {
+func (r *PipelineRepoPostgres) GetAll() ([]*domain.Pipeline, error) {
 	rows, err := r.db.Query(`
 		SELECT id, name, commit_sha, status, created_at, updated_at
 		FROM pipelines
-		ORDER BY created_at DESC
+		ORDER BY id DESC
 	`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var pipelines []domain.Pipeline
-
+	var pipelines []*domain.Pipeline
 	for rows.Next() {
 		var p domain.Pipeline
-		err := rows.Scan(
+		if err := rows.Scan(
 			&p.ID,
 			&p.Name,
 			&p.CommitSHA,
 			&p.Status,
 			&p.CreatedAt,
 			&p.UpdatedAt,
-		)
-		if err != nil {
+		); err != nil {
 			return nil, err
 		}
-		pipelines = append(pipelines, p)
+		pipelines = append(pipelines, &p)
 	}
 
 	return pipelines, nil
