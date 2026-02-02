@@ -28,6 +28,20 @@ func (r *PipelineRepoPostgres) CreatePipeline(p *domain.Pipeline) error {
 	).Scan(&p.ID, &p.CreatedAt, &p.UpdatedAt)
 }
 
+func (r *PipelineRepoPostgres) GetByID(id int64) (*domain.Pipeline, error) {
+	var p domain.Pipeline
+	err := r.db.QueryRow(`
+		SELECT id, name, commit_sha, status, created_at, updated_at
+		FROM pipelines WHERE id=$1
+	`, id).Scan(
+		&p.ID, &p.Name, &p.CommitSHA, &p.Status, &p.CreatedAt, &p.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
+}
+
 func (r *PipelineRepoPostgres) UpdatePipelineStatus(id int64, status domain.PipelineStatus) error {
 	_, err := r.db.Exec(`
 		UPDATE pipelines
@@ -94,4 +108,35 @@ func (r *PipelineRepoPostgres) UpdateStage(s *domain.Stage) error {
 		s.ID,
 	)
 	return err
+}
+
+func (r *PipelineRepoPostgres) GetStages(pipelineID int64) ([]*domain.Stage, error) {
+	rows, err := r.db.Query(`
+		SELECT id, pipeline_id, name, status, logs, started_at, finished_at
+		FROM stages
+		WHERE pipeline_id=$1
+		ORDER BY id
+	`, pipelineID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stages []*domain.Stage
+	for rows.Next() {
+		var s domain.Stage
+		if err := rows.Scan(
+			&s.ID,
+			&s.PipelineID,
+			&s.Name,
+			&s.Status,
+			&s.Logs,
+			&s.StartedAt,
+			&s.FinishedAt,
+		); err != nil {
+			return nil, err
+		}
+		stages = append(stages, &s)
+	}
+	return stages, nil
 }

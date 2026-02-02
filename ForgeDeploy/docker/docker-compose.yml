@@ -3,15 +3,32 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16
-    container_name: forgedeploy-postgres
     environment:
+      POSTGRES_DB: forgedeploy
       POSTGRES_USER: forgedeploy
       POSTGRES_PASSWORD: forgedeploy
-      POSTGRES_DB: forgedeploy
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/app.Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_DSN: postgres://forgedeploy:forgedeploy@postgres:5432/forgedeploy?sslmode=disable
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/worker.Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_DSN: postgres://forgedeploy:forgedeploy@postgres:5432/forgedeploy?sslmode=disable
 
 volumes:
   pgdata:

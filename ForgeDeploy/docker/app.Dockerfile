@@ -18,3 +18,6 @@ USER nonroot:nonroot
 EXPOSE 8080
 
 CMD ["./app"]
+
+HEALTHCHECK --interval=5s --timeout=2s --retries=12 \
+  CMD wget -qO- http://localhost:8080/health || exit 1

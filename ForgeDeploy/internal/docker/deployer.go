@@ -12,7 +12,7 @@ func RunContainer(ctx context.Context, name, image string) error {
 		ctx,
 		"docker", "run", "-d",
 		"--name", name,
-		"-p", "8080:8080",
+		"-p", "8081:8080",
 		image,
 	)
 
